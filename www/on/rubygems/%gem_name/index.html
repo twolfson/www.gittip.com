@@ -1,0 +1,46 @@
+import requests
+from aspen import json, Response
+
+can_tip = False # can't tip a gem directly!
+gem_name = path['gem_name']
+gem_url = 'http://rubygems.org/gems/%s' % gem_name
+resp = requests.get("http://0.0.0.0:3000/api/v1/gems/%s/owners.json" % gem_name)
+if resp.status_code == 200:
+  owners = json.loads(resp.text)
+
+# ========================================================================== ^L
+{% extends templates/participant.html %}
+
+{% block their_voice %}
+    <script>
+        $(document).ready(Gittip.initTipButtons);
+    </script>
+
+    <h2 class="first"><b>{{ gem_name }}</b> is a gem on RubyGems.</h2>
+    <table id="accounts">
+        <tr>
+            <td class="account-type">
+                <img src="/assets/octocat.png" />
+            </td>
+            <td class="account-details">
+                <a href="{{ gem_url }}">
+                     {{ gem_name }}
+                </a>
+                <div class="account-type">RubyGems</div>
+            </td>
+        </tr>
+    </table>
+
+    {% if len(owners) == 0 %}
+        {{ gem_name }} doesn't have any owners!
+    {% elif len(owners) == 1 %}
+        {{ gem_name }} has one public owners.
+    {% else %}
+        Here are the {{ len(owners) }} public owners of <a href="{{ gem_url }}">{{ gem_name }}</a>:
+    {% end %}
+    <ul>
+        {% for owner in owners %}
+            <li>{{ owner['gittip_username'] }}</li>
+        {% end %}
+    </ul>
+{% end %}
