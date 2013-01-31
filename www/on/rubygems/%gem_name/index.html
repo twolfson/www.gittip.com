@@ -1,12 +1,22 @@
 import requests
 from aspen import json, Response
 
-can_tip = False # can't tip a gem directly!
 gem_name = path['gem_name']
 gem_url = 'http://rubygems.org/gems/%s' % gem_name
-resp = requests.get("http://0.0.0.0:3000/api/v1/gems/%s/owners.json" % gem_name)
+resp = requests.get("https://rubygems.org/api/v1/gems/%s/owners.json" % gem_name)
 if resp.status_code == 200:
   owners = json.loads(resp.text)
+
+on_gittip = []
+not_on_gittip = []
+
+username = gem_name
+
+for owner in owners:
+    seq = on_gittip if ('gittip_username' in owner) else not_on_gittip
+    tip_to = None if (user.ANON or seq == not_on_gittip) else user.get_tip_to(owner['gittip_username'])
+    seq.append((owner, tip_to))
+can_tip = user.ANON
 
 # ========================================================================== ^L
 {% extends templates/participant.html %}
@@ -31,16 +41,37 @@ if resp.status_code == 200:
         </tr>
     </table>
 
-    {% if len(owners) == 0 %}
-        {{ gem_name }} doesn't have any owners!
-    {% elif len(owners) == 1 %}
-        {{ gem_name }} has one public owners.
-    {% else %}
-        Here are the {{ len(owners) }} public owners of <a href="{{ gem_url }}">{{ gem_name }}</a>:
-    {% end %}
-    <ul>
-        {% for owner in owners %}
-            <li>{{ owner['gittip_username'] }}</li>
+    <table id="members">
+      {% for i, sequence in enumerate([on_gittip]) %}
+        {% if sequence %}<tr><td colspan="2"><h3>{{ i == 0 and "Also on" or "Not on" }} Gittip</h3></td></tr>{% end %}
+        {% for member, tip in sequence %}
+        <tr class="not-over"><td>
+            {% if not user.ANON %}
+            <th>
+                <a href="/{{ member['gittip_username'] }}"><img src="{{'/assets/%s/no-avatar.png' % __version__ }}" />
+                    {{ member['gittip_username'] }}</a>
+            </th>
+            <td>
+                {% for amount in AMOUNTS %}
+                <button amount="{{ amount }}" tippee="{{ member['gittip_username'] }}"
+                    class="tip small {{ 'selected' if amount == tip else 'empty' }}">{{ amount }}</button>
+                {% end %}
+                {% if tip not in AMOUNTS %}
+                <span class="old-amount">
+                    <button class="tip small disabled selected">{{ tip }}</button>
+                    <span class="old-amount-link">&mdash;
+                    <a href="http://blog.gittip.com/post/26505682007/is-personal-funding-viable" target="_blank">old amount</a>!</span>
+                </span>
+                {% end %}
+            </td>
+            {% else %}
+            <td>
+                <a href="/{{ member['gittip_username'] }}"><img src="{{'/assets/%s/no-avatar.png' % __version__ }}" />
+                    {{ member['gittip_username'] }}</a>
+            </td>
+            {% end %}
+        </td></tr>
         {% end %}
-    </ul>
+      {% end %}
+    </table>
 {% end %}
