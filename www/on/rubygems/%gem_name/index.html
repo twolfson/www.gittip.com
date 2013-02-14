@@ -1,11 +1,15 @@
 import requests
-from aspen import json, Response
+from aspen import json
+from gittip import AMOUNTS
+# ========================================================================== ^L
 
 gem_name = path['gem_name']
 gem_url = 'http://rubygems.org/gems/%s' % gem_name
-resp = requests.get("https://rubygems.org/api/v1/gems/%s/owners.json" % gem_name)
+resp = requests.get( "https://rubygems.org/api/v1/gems/%s/owners.json"
+                   % gem_name
+                    )
 if resp.status_code == 200:
-  owners = json.loads(resp.text)
+    owners = json.loads(resp.text)
 
 on_gittip = []
 not_on_gittip = []
@@ -14,64 +18,95 @@ username = gem_name
 
 for owner in owners:
     seq = on_gittip if ('gittip_username' in owner) else not_on_gittip
-    tip_to = None if (user.ANON or seq == not_on_gittip) else user.get_tip_to(owner['gittip_username'])
+    tip_to = None if user.ANON else \
+                                  user.get_tip_to(owner.get('gittip_username'))
     seq.append((owner, tip_to))
-can_tip = user.ANON
+
+img_src = "/assets/icons/ruby.256.png"
+# ht http://www.iconspedia.com/icon/ruby-63-8.html
+url = gem_url
+number = len(owners)
+title = username
 
 # ========================================================================== ^L
-{% extends templates/participant.html %}
+{% extends templates/base.html %}
 
-{% block their_voice %}
-    <script>
-        $(document).ready(Gittip.initTipButtons);
-    </script>
+{% block heading %}<h2 class="top"><span>RubyGems</span></h2>{% end %}
 
-    <h2 class="first"><b>{{ gem_name }}</b> is a gem on RubyGems.</h2>
-    <table id="accounts">
-        <tr>
-            <td class="account-type">
-                <img src="/assets/octocat.png" />
-            </td>
-            <td class="account-details">
-                <a href="{{ gem_url }}">
-                     {{ gem_name }}
-                </a>
-                <div class="account-type">RubyGems</div>
-            </td>
-        </tr>
-    </table>
+{% block box %}
 
-    <table id="members">
-      {% for i, sequence in enumerate([on_gittip]) %}
-        {% if sequence %}<tr><td colspan="2"><h3>{{ i == 0 and "Also on" or "Not on" }} Gittip</h3></td></tr>{% end %}
-        {% for member, tip in sequence %}
-        <tr class="not-over"><td>
-            {% if not user.ANON %}
-            <th>
-                <a href="/{{ member['gittip_username'] }}"><img src="{{'/assets/%s/no-avatar.png' % __version__ }}" />
-                    {{ member['gittip_username'] }}</a>
-            </th>
-            <td>
-                {% for amount in AMOUNTS %}
-                <button amount="{{ amount }}" tippee="{{ member['gittip_username'] }}"
-                    class="tip small {{ 'selected' if amount == tip else 'empty' }}">{{ amount }}</button>
+<table class="on-elsewhere">
+    <tr>
+        <td class="picture">
+            <img src="{{ img_src }}" />
+        </td>
+        <td class="ready">
+            <h2><a href="{{ url }}">{{ username }}</a> has</h2>
+            <div class="number">{{ number }}</div>
+            <div class="unit">owner{{ '' if number == 1 else 's' }}</div>
+        </td>
+        <td class="offset"></td>
+    </tr>
+</table>
+
+{% if user.ANON %}
+<div class="buttons tips">
+
+    <div class="help with-padding">Sign in using
+        <a href="{{ twitter.oauth_url(website, u'opt-in', path.decoded) }}">Twitter</a> or
+        <a href="{{ github.oauth_url(website, u'opt-in', path.decoded) }}">GitHub</a>
+        to pledge to <b>{{ username }}</b>.</div>
+
+</div>
+{% end %}
+
+{% end %}
+
+{% block page %}
+<script>$(document).ready(Gittip.initTipButtons);</script>
+
+<table id="members" class="centered">
+  {% for i, sequence in enumerate([on_gittip, not_on_gittip]) %}
+    {% set nsequence = len(sequence) %}
+    {% if sequence %}<tr><td colspan="2">
+            <h2>{{ nsequence }}
+                {% if number > 0 %}
+                ({{ "%.1f" % (nsequence * 100 / float(number)) }}%)
                 {% end %}
-                {% if tip not in AMOUNTS %}
-                <span class="old-amount">
-                    <button class="tip small disabled selected">{{ tip }}</button>
-                    <span class="old-amount-link">&mdash;
-                    <a href="http://blog.gittip.com/post/26505682007/is-personal-funding-viable" target="_blank">old amount</a>!</span>
-                </span>
-                {% end %}
-            </td>
-            {% else %}
-            <td>
-                <a href="/{{ member['gittip_username'] }}"><img src="{{'/assets/%s/no-avatar.png' % __version__ }}" />
-                    {{ member['gittip_username'] }}</a>
-            </td>
+                {{ 'is' if nsequence == 1 else 'are' }}
+                {{ i == 0 and "also on" or "not on" }} Gittip</h2>
+    </td></tr>
+    {% end %}
+    {% for member, tip in sequence %}
+    <tr class="not-over"><td>
+        {% if not user.ANON %}
+        <th>
+            <a href="/on/rubygems/profile/{{ member['email'] }}/"><img src="{{ member.get('avatar_url', '/assets/%s/no-avatar.png' % __version__) }}" />
+                {{ member['email'] }}</a>
+        </th>
+        <td>
+            {% for amount in AMOUNTS %}
+            <button amount="{{ amount }}" tippee="{{ member['email'] }}"
+                class="tip small {{ 'selected' if amount == tip else 'empty' }}">{{ amount }}</button>
             {% end %}
-        </td></tr>
+            {% if tip not in AMOUNTS %}
+            <span class="old-amount">
+                <button class="tip small disabled selected">{{ tip }}</button>
+                <span class="old-amount-link">&mdash;
+                <a href="http://blog.gittip.com/post/26505682007/is-personal-funding-viable" target="_blank">old amount</a>!</span>
+            </span>
+            {% end %}
+        </td>
+        {% else %}
+        <td>
+            <a href="/on/rubygems/profile/{{ member['email'] }}/"><img src="{{ member.get('avatar_url', '/assets/%s/no-avatar.png' % __version__) }}" />
+                {{ member['email'] }}</a>
+        </td>
         {% end %}
-      {% end %}
-    </table>
+    </td></tr>
+    {% end %}
+  {% end %}
+</table>
+
+
 {% end %}
