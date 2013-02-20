@@ -1,0 +1,21 @@
+from gittip.utils import get_participant
+^L
+
+participant = get_participant(request)
+locked = False
+tip_or_pledge = "tip"
+hero = "Profile"
+title = participant.id      # used in the title tag
+username = participant.id   # used in footer shared with on/$platform/ pages
+github_account, twitter_account = participant.get_accounts_elsewhere()
+
+^L
+{% extends templates/profile.html %}
+{% block page %}
+<div class="col0">
+    <h2>Delete Account</h2>
+
+    <p></p>
+
+</div>
+{% end %}
