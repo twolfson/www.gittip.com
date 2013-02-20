@@ -809,30 +809,8 @@ class Participant(object):
 
                 # Archive the old participant.
                 # ============================
-                # We always give them a new, random participant_id. We sign out
-                # the old participant.
 
-                for archive_id in gen_random_participant_ids():
-                    try:
-                        txn.execute("""
-
-                            UPDATE participants
-                               SET id=%s
-                                 , session_token=NULL
-                                 , session_expires=now()
-                             WHERE id=%s
-                         RETURNING id
-
-                        """, (archive_id, other_id))
-                        rec = txn.fetchone()
-                    except IntegrityError:
-                        continue  # archive_id is already taken; extremely
-                                  # unlikely, but ...
-                                  # XXX But can the UPDATE fail in other ways?
-                    else:
-                        assert rec is not None  # sanity checks
-                        assert rec['id'] == archive_id
-                        break
+                archived_as = self.archive(txn, other_id)
 
 
                 # Record the absorption.
@@ -842,7 +820,7 @@ class Participant(object):
                 txn.execute( "INSERT INTO absorptions "
                              "(absorbed_was, absorbed_by, archived_as) "
                              "VALUES (%s, %s, %s)"
-                           , (other_id, self.id, archive_id)
+                           , (other_id, self.id, archived_as)
                             )
 
 
@@ -857,3 +835,53 @@ class Participant(object):
             #   https://github.com/zetaweb/www.gittip.com/issues/129
 
             account_elsewhere.participant_id = self.id
+
+
+    @require_id
+    def delete(self):
+        """
+        """
+        with gittip.db.get_transaction() as txn:
+            deleted_was = self.id
+            archived_as = self.archive(txn, deleted_was)
+            txn.execute("""
+
+                INSERT INTO deletions (deleted_was, archived_as)
+                     VALUES (%s, %s)
+
+            """, (deleted_was, archived_as))
+            self.id = None
+        return archived_as
+
+
+    @require_id
+    def archive(self, txn, other_id):
+        """Given an open transaction, return the new participant_id.
+
+        Archiving a user means changing their participant_id to a random string
+        and signing them out.
+
+        """
+        for candidate in gen_random_participant_ids():
+            try:
+                # rename and sign out
+                txn.execute("""
+
+                    UPDATE participants
+                       SET id=%s
+                         , session_token=NULL
+                         , session_expires=now()
+                     WHERE id=%s
+                 RETURNING id
+
+                """, (candidate, other_id))
+                rec = txn.fetchone()
+            except IntegrityError:
+                continue  # archive_id is already taken; extremely
+                          # unlikely, but ...
+                          # XXX But can the UPDATE fail in other ways?
+            else:
+                assert rec is not None  # sanity checks
+                assert rec['id'] == candidate
+                break
+        return candidate

@@ -96,6 +96,7 @@ class GittipBaseDBTest(unittest.TestCase):
                  , 'paydays'
                  , 'exchanges'
                  , 'absorptions'
+                 , 'deletions'
                   ]
         for t in tables:
             self.db.execute('truncate table %s cascade' % t)
@@ -442,6 +443,12 @@ def tip_graph(*a, **kw):
     context.resolve_elsewhere = resolve_elsewhere  # Wheeee! :D
 
     return context
+
+
+def looks_random(s):
+    """Sniff strings per gittip.participant.gen_random_participant_ids.
+    """
+    return re.match(r'^[0-9a-f]{12}$', s)
 
 
 # Helpers for testing simplates.

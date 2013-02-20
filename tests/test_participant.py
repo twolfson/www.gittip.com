@@ -7,7 +7,7 @@ from nose.tools import assert_raises, assert_equals
 
 from gittip.models import Absorption, Tip
 from gittip.participant import Participant, NeedConfirmation
-from gittip.testing import Harness
+from gittip.testing import Harness, looks_random
 from gittip.elsewhere.twitter import TwitterAccount
 
 # TODO: Test that accounts elsewhere are not considered claimed by default
@@ -102,6 +102,25 @@ class TestAbsorptions(Harness):
     def test_there_is_no_more_deadbeef(self):
         actual = Participant('deadbeef').get_details()
         assert actual is None, actual
+
+
+class TestDeletion(Harness):
+
+    def test_delete_returns_random_id(self):
+        self.make_participant('alice')
+        actual = Participant('alice').delete()
+        assert looks_random(actual), actual
+
+    def test_delete_sets_id_to_None(self):
+        self.make_participant('alice')
+        alice = Participant('alice')
+        alice.delete()
+        assert alice.id is None, alice.id
+
+    def test_deleting_a_non_existent_user_assertion_errors(self):
+        alice = Participant('alice')
+        with assert_raises(AssertionError):
+            alice.delete()
 
 
 class TestParticipant(Harness):
