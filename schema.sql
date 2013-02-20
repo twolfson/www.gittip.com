@@ -300,3 +300,21 @@ ALTER TABLE elsewhere ALTER COLUMN participant_id SET NOT NULL;
 
 ALTER TABLE elsewhere ADD CONSTRAINT "elsewhere_platform_participant_id_key"
     UNIQUE (platform, participant_id);
+
+
+-------------------------------------------------------------------------------
+-- https://github.com/zetaweb/www.gittip.com/issues/586
+
+CREATE TABLE deletions
+( id                    serial                      PRIMARY KEY
+, timestamp             timestamp with time zone    NOT NULL
+    DEFAULT CURRENT_TIMESTAMP
+
+, deleted_was           text                        NOT NULL
+    -- Not a foreign key! This is soft-immutable.
+
+, archived_as           text                        NOT NULL
+    REFERENCES participants ON DELETE RESTRICT ON UPDATE RESTRICT
+    -- UPDATE RESTRICT is a sanity check: noone should be changing
+    -- participant_ids of deleted accounts.
+ );
