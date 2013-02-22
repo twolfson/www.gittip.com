@@ -262,5 +262,9 @@ class Participant(db.Model):
         return OldParticipant(self.id).get_tips_and_total(for_payday, db)
 
     def take_over(self, account_elsewhere, have_confirmation=False):
-        OldParticipant(self.id).take_over(account_elsewhere,
-                                            have_confirmation)
+        return OldParticipant(self.id).take_over( account_elsewhere
+                                                , have_confirmation
+                                                 )
+
+    def delete(self):
+        return OldParticipant(self.id).delete()

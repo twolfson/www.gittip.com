@@ -5,7 +5,8 @@ from decimal import Decimal
 from aspen.utils import utcnow
 from nose.tools import assert_raises, assert_equals
 
-from gittip.models import Absorption, Tip
+from gittip.models import Absorption, Deletion, User, Tip
+from gittip.orm import db
 from gittip.participant import Participant, NeedConfirmation
 from gittip.testing import Harness, looks_random
 from gittip.elsewhere.twitter import TwitterAccount
@@ -107,20 +108,50 @@ class TestAbsorptions(Harness):
 class TestDeletion(Harness):
 
     def test_delete_returns_random_id(self):
-        self.make_participant('alice')
-        actual = Participant('alice').delete()
+        actual = self.make_participant('alice').delete()
         assert looks_random(actual), actual
 
-    def test_delete_sets_id_to_None(self):
-        self.make_participant('alice')
-        alice = Participant('alice')
+    def test_deleted_participant_is_out_of_sync(self):
+        alice = self.make_participant('alice')
         alice.delete()
-        assert alice.id is None, alice.id
+        actual = alice.id
+        assert actual == 'alice', actual
+
+    def test_deleted_participant_has_no_session(self):
+        alice = self.make_participant('alice')
+        import pdb; pdb.set_trace()
+        assert User.from_session_token(alice.session_token).ANON
+        alice.session_token = 'foo'
+        assert User.from_session_token(alice.session_token).ANON
+        db.session.commit()
+        assert User.from_session_token(alice.session_token).ANON
+        alice.delete()
+        assert User.from_session_token(alice.session_token).ANON
 
     def test_deleting_a_non_existent_user_assertion_errors(self):
         alice = Participant('alice')
         with assert_raises(AssertionError):
             alice.delete()
+
+    def test_no_deletions_to_start_with(self):
+        self.make_participant('alice')
+        actual = Deletion.query.filter_by().count()
+        assert actual == 0, actual
+
+    def test_delete_records_one_deletion(self):
+        self.make_participant('alice').delete()
+        actual = Deletion.query.filter_by().count()
+        assert actual == 1, actual
+
+    def test_deletion_records_deleted_was(self):
+        self.make_participant('alice').delete()
+        actual = Deletion.query.filter_by()[0].deleted_was
+        assert actual == 'alice', actual
+
+    def test_deletion_records_archived_as(self):
+        self.make_participant('alice').delete()
+        actual = Deletion.query.filter_by()[0].archived_as
+        assert looks_random(actual)
 
 
 class TestParticipant(Harness):

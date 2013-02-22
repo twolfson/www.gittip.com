@@ -850,7 +850,6 @@ class Participant(object):
                      VALUES (%s, %s)
 
             """, (deleted_was, archived_as))
-            self.id = None
         return archived_as
 
 
