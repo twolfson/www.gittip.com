@@ -1,0 +1,40 @@
+from gittip.utils import get_participant
+^L
+
+participant = get_participant(request)
+locked = False
+tip_or_pledge = "tip"
+title = participant.id      # used in the title tag
+username = participant.id   # used in footer shared with on/$platform/ pages
+github_account, twitter_account = participant.get_accounts_elsewhere()
+
+^L
+{% extends templates/base.html %}
+{% block heading %}
+<h2 class="top"><span>Deactivate</span></h2>
+{% end %}
+{% block box %}
+    <div class="on-form">
+        <form action="./deactivate.html" method="POST">
+            <p>Thanks for giving us a try. Sorry for failing you.</p>
+
+            <p>Here are the steps we will take when you deactivate your
+            Gittip account:</p>
+
+            <ul>
+
+                <li><b>Immediately</b>, we make your username available to
+                others.</li>
+
+                <li></li>
+
+            </ul>
+
+            <div class="buttons tips">
+                <button class="selected">Deactivate</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% end %}

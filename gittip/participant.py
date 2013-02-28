@@ -838,8 +838,8 @@ class Participant(object):
 
 
     @require_id
-    def delete(self):
-        """
+    def deactivate(self):
+        """Deactivate this account.
         """
         with gittip.db.get_transaction() as txn:
             deleted_was = self.id

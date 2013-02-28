@@ -105,19 +105,19 @@ class TestAbsorptions(Harness):
         assert actual is None, actual
 
 
-class TestDeletion(Harness):
+class TestDeactivation(Harness):
 
-    def test_delete_returns_random_id(self):
-        actual = self.make_participant('alice').delete()
+    def test_deactivate_returns_random_id(self):
+        actual = self.make_participant('alice').deactivate()
         assert looks_random(actual), actual
 
-    def test_deleted_participant_is_out_of_sync(self):
+    def test_deactivated_participant_is_out_of_sync(self):
         alice = self.make_participant('alice')
-        alice.delete()
+        alice.deactivate()
         actual = alice.id
         assert actual == 'alice', actual
 
-    def test_deleted_participant_has_no_session(self):
+    def test_deactivated_participant_has_no_session(self):
         alice = self.make_participant('alice')
         import pdb; pdb.set_trace()
         assert User.from_session_token(alice.session_token).ANON
@@ -125,31 +125,31 @@ class TestDeletion(Harness):
         assert User.from_session_token(alice.session_token).ANON
         db.session.commit()
         assert User.from_session_token(alice.session_token).ANON
-        alice.delete()
+        alice.deactivate()
         assert User.from_session_token(alice.session_token).ANON
 
     def test_deleting_a_non_existent_user_assertion_errors(self):
         alice = Participant('alice')
         with assert_raises(AssertionError):
-            alice.delete()
+            alice.deactivate()
 
-    def test_no_deletions_to_start_with(self):
+    def test_no_deactivations_to_start_with(self):
         self.make_participant('alice')
         actual = Deletion.query.filter_by().count()
         assert actual == 0, actual
 
-    def test_delete_records_one_deletion(self):
-        self.make_participant('alice').delete()
+    def test_deactivate_records_one_deactivation(self):
+        self.make_participant('alice').deactivate()
         actual = Deletion.query.filter_by().count()
         assert actual == 1, actual
 
-    def test_deletion_records_deleted_was(self):
-        self.make_participant('alice').delete()
-        actual = Deletion.query.filter_by()[0].deleted_was
+    def test_deactivation_records_deactivated_was(self):
+        self.make_participant('alice').deactivate()
+        actual = Deletion.query.filter_by()[0].deactivated_was
         assert actual == 'alice', actual
 
-    def test_deletion_records_archived_as(self):
-        self.make_participant('alice').delete()
+    def test_deactivation_records_archived_as(self):
+        self.make_participant('alice').deactivate()
         actual = Deletion.query.filter_by()[0].archived_as
         assert looks_random(actual)
 

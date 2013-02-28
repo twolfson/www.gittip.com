@@ -266,5 +266,5 @@ class Participant(db.Model):
                                                 , have_confirmation
                                                  )
 
-    def delete(self):
-        return OldParticipant(self.id).delete()
+    def deactivate(self):
+        return OldParticipant(self.id).deactivate()
