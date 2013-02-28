@@ -305,16 +305,16 @@ ALTER TABLE elsewhere ADD CONSTRAINT "elsewhere_platform_participant_id_key"
 -------------------------------------------------------------------------------
 -- https://github.com/zetaweb/www.gittip.com/issues/586
 
-CREATE TABLE deletions
+CREATE TABLE deactivations
 ( id                    serial                      PRIMARY KEY
 , timestamp             timestamp with time zone    NOT NULL
     DEFAULT CURRENT_TIMESTAMP
 
-, deleted_was           text                        NOT NULL
+, deactivated_was           text                        NOT NULL
     -- Not a foreign key! This is soft-immutable.
 
 , archived_as           text                        NOT NULL
     REFERENCES participants ON DELETE RESTRICT ON UPDATE RESTRICT
-    -- UPDATE RESTRICT is a sanity check: noone should be changing
-    -- participant_ids of deleted accounts.
+    -- UPDATE RESTRICT is a sanity check: no-one should be changing
+    -- participant_ids of deactivated accounts.
  );
