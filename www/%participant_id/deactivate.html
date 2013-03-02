@@ -2,6 +2,11 @@ from gittip.utils import get_participant
 ^L
 
 participant = get_participant(request)
+if POST:
+    import pdb; pdb.set_trace()
+    participant.deactivate()
+    request.redirect('/')
+
 locked = False
 tip_or_pledge = "tip"
 title = participant.id      # used in the title tag
