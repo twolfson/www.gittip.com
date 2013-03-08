@@ -3,7 +3,7 @@
 # .metadata, and thus aren't cleaned up properly during teardown.)
 
 from gittip.models.absorption import Absorption
-from gittip.models.deletion import Deletion
+from gittip.models.deactivation import Deactivation
 
 
 # The rest we actually use.

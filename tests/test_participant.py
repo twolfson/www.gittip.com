@@ -5,7 +5,7 @@ from decimal import Decimal
 from aspen.utils import utcnow
 from nose.tools import assert_raises, assert_equals
 
-from gittip.models import Absorption, Deletion, User, Tip
+from gittip.models import Absorption, Deactivation, User, Tip
 from gittip.orm import db
 from gittip.participant import Participant, NeedConfirmation
 from gittip.testing import Harness, looks_random
@@ -135,22 +135,22 @@ class TestDeactivation(Harness):
 
     def test_no_deactivations_to_start_with(self):
         self.make_participant('alice')
-        actual = Deletion.query.filter_by().count()
+        actual = Deactivation.query.filter_by().count()
         assert actual == 0, actual
 
     def test_deactivate_records_one_deactivation(self):
         self.make_participant('alice').deactivate()
-        actual = Deletion.query.filter_by().count()
+        actual = Deactivation.query.filter_by().count()
         assert actual == 1, actual
 
     def test_deactivation_records_deactivated_was(self):
         self.make_participant('alice').deactivate()
-        actual = Deletion.query.filter_by()[0].deactivated_was
+        actual = Deactivation.query.filter_by()[0].deactivated_was
         assert actual == 'alice', actual
 
     def test_deactivation_records_archived_as(self):
         self.make_participant('alice').deactivate()
-        actual = Deletion.query.filter_by()[0].archived_as
+        actual = Deactivation.query.filter_by()[0].archived_as
         assert looks_random(actual)
 
 

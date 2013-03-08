@@ -842,14 +842,17 @@ class Participant(object):
         """Deactivate this account.
         """
         with gittip.db.get_transaction() as txn:
-            deleted_was = self.id
-            archived_as = self.archive(txn, deleted_was)
+            deactivated_was = self.id
+            archived_as = self.archive(txn, deactivated_was)
             txn.execute("""
 
-                INSERT INTO deletions (deleted_was, archived_as)
-                     VALUES (%s, %s)
+                INSERT
+                    INTO deactivations
+                        (deactivated_was, archived_as)
+                    VALUES
+                        (%s, %s)
 
-            """, (deleted_was, archived_as))
+            """, (deactivated_was, archived_as))
         return archived_as
 
 
