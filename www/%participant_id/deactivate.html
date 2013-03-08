@@ -21,24 +21,28 @@ github_account, twitter_account = participant.get_accounts_elsewhere()
 {% block box %}
     <div class="on-form">
         <form action="./deactivate.html" method="POST">
+            <div class="lots-of-text">
 
-            <p>Here are the steps we will take when you deactivate your
-            Gittip account:</p>
+                <ol>
 
-            <ul>
+                    <li>Your username will become available to others.</li>
 
-                <li><b>Immediately</b>, we make your username available to
-                others.</li>
+                    <li>We will disconnect accounts such as Twitter.</li>
 
-                <li></li>
+                    <li>We will invalidate your payment credentials.</li>
 
-            </ul>
+                    <li>We will retain your giving and receiving history, so
+                    that those you gave to or received from will continue to
+                    see a consistent view of their history.</li>
 
-            <p>Thanks for giving us a try, and sorry it didn't work out. Best
-            wishes! :)</p>
+                </ol>
 
+                <p>Thanks for giving us a try, and sorry it didn't work
+                out.</p>
+
+            </div>
             <div class="nav level-1">
-                <button class="selected">Deactivate</button>
+                <button class="selected larger">Deactivate</button>
             </div>
         </form>
     </div>

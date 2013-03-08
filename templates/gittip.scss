@@ -630,6 +630,9 @@ button.selected:hover {
 
     .on-form {
         text-align: left;
+        .lots-of-text {
+            margin: 15px;
+        }
 
         .constrain-width {
             margin: 0 auto 35px;
