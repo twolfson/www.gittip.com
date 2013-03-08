@@ -3,7 +3,6 @@ from gittip.utils import get_participant
 
 participant = get_participant(request)
 if POST:
-    import pdb; pdb.set_trace()
     participant.deactivate()
     request.redirect('/')
 
