@@ -41,7 +41,10 @@ github_account, twitter_account = participant.get_accounts_elsewhere()
 
             </div>
             <div class="nav level-1">
-                <button class="selected larger">Deactivate</button>
+                <input type="hidden" name="csrf_token"
+                    value="{{ csrf_token }}" />
+                <button class="selected larger"
+                    type="submit">Deactivate</button>
             </div>
         </form>
     </div>
