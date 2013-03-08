@@ -119,12 +119,11 @@ class TestDeactivation(Harness):
 
     def test_deactivated_participant_has_no_session(self):
         alice = self.make_participant('alice')
-        import pdb; pdb.set_trace()
         assert User.from_session_token(alice.session_token).ANON
         alice.session_token = 'foo'
-        assert User.from_session_token(alice.session_token).ANON
+        assert not User.from_session_token(alice.session_token).ANON
         db.session.commit()
-        assert User.from_session_token(alice.session_token).ANON
+        assert not User.from_session_token(alice.session_token).ANON
         alice.deactivate()
         assert User.from_session_token(alice.session_token).ANON
 
