@@ -21,7 +21,6 @@ github_account, twitter_account = participant.get_accounts_elsewhere()
 {% block box %}
     <div class="on-form">
         <form action="./deactivate.html" method="POST">
-            <p>Thanks for giving us a try. Sorry for failing you.</p>
 
             <p>Here are the steps we will take when you deactivate your
             Gittip account:</p>
@@ -35,7 +34,10 @@ github_account, twitter_account = participant.get_accounts_elsewhere()
 
             </ul>
 
-            <div class="buttons tips">
+            <p>Thanks for giving us a try, and sorry it didn't work out. Best
+            wishes! :)</p>
+
+            <div class="nav level-1">
                 <button class="selected">Deactivate</button>
             </div>
         </form>
