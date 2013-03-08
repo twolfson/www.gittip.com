@@ -4,6 +4,7 @@ from gittip.utils import get_participant
 participant = get_participant(request)
 if POST:
     participant.deactivate()
+    user = None
     request.redirect('/')
 
 locked = False
