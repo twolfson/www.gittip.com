@@ -303,6 +303,16 @@ ALTER TABLE elsewhere ADD CONSTRAINT "elsewhere_platform_participant_id_key"
 
 
 -------------------------------------------------------------------------------
+-- https://github.com/zetaweb/www.gittip.com/issues/53
+
+ALTER TABLE exchanges ADD COLUMN recorder text DEFAULT NULL
+        REFERENCES participants(id)
+        ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE exchanges ADD COLUMN note text DEFAULT NULL;
+
+
+-------------------------------------------------------------------------------
 -- https://github.com/zetaweb/www.gittip.com/issues/586
 
 CREATE TABLE deactivations
