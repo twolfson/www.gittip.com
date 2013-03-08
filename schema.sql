@@ -320,7 +320,7 @@ CREATE TABLE deactivations
 , timestamp             timestamp with time zone    NOT NULL
     DEFAULT CURRENT_TIMESTAMP
 
-, deactivated_was           text                        NOT NULL
+, deactivated_was       text                        NOT NULL
     -- Not a foreign key! This is soft-immutable.
 
 , archived_as           text                        NOT NULL
