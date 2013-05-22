@@ -42,6 +42,42 @@ The only hard requirement on your system is [Python
 All library dependencies are bundled in the repo (under `vendor/`) and by
 default the app is configured to use a Postgres instance in the cloud.
 
+Running the Gittip tests, `make test` requires much more, including
+gcc, make, Postgres server and client. Ideally, Postgres 9.2, but
+Postgres 9.1 with the hstore option will work.
+
+To be able to run `make test` on Ubuntu, install these packages:
+
+    sudo apt-get install \
+        python python-dev \
+        gcc make \
+        postgresql \
+        postgresql-client \
+        postgresql-contrib \
+        postgresql-server-dev-9.1
+
+
+Automated Cloud Setup
+---------------------
+
+This is experimental.
+
+Requires Java and [Leiningen](http://leiningen.org/). Leiningen will
+pull in all of the other dependencies that are needed. The project
+setup for Leiningen is in [project.clj](project.clj). The provisioning
+software this uses is [Pallet](http://palletops.com/). The Pallet
+setups are in [pallet.clj](pallet.clj).
+
+With Leiningen's `lein` script on your path and a Pallet provider
+setup (need to describe this!) this command:
+
+    lein pallet up --phases install,configure
+
+will stand up a new virtual machine with Postgres running and a fresh
+checkout of Gittip ready to go. To tear down the virtual machine,
+issue this command:
+
+    lein pallet down
 
 Building and Launching
 ----------------------
